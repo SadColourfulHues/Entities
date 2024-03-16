@@ -73,7 +73,7 @@ public partial class HealthComponent : Node
 	/// will never be applied when using this method.
 	/// </summary>
 	/// <param name="damage">The amount of damage to inflict on the entity.</param>
-	public void TakePureDamage(float damage)
+	public void TakeFixedDamage(float damage)
 	{
 		if (IsInvulnerable)
 			return;
