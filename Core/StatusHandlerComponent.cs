@@ -38,20 +38,21 @@ public sealed partial class StatusHandlerComponent : Node
 	[Export]
 	private StatusRegistry _registryRef;
 
-	private const int MaxStatuses = 8;
+	[Export]
+	private int MaxStatuses = 8;
 
-	private readonly IStatus[] _statuses;
+	private IStatus[] _statuses;
 	private IEntity _owningEntityRef;
 
 	private bool _isLocked;
 
-	// Called when the node enters the scene tree for the first time.
-	public StatusHandlerComponent()
-	{
-		_statuses = new IStatus[MaxStatuses];
-	}
+    public override void _EnterTree()
+    {
+        _statuses = new IStatus[MaxStatuses];
+    }
 
-	public override void _Ready()
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
 	{
 		Node ownerRef = GetOwnerOrNull<Node>();
 
