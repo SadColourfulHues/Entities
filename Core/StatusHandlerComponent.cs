@@ -67,6 +67,20 @@ public sealed partial class StatusHandlerComponent : Node
 	#region Main Functions
 
 	/// <summary>
+	/// Returns a reference of a status instance at the specified index
+	/// Normally shouldn't be used other than for displaying status info.
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
+	public IStatus GetStatusRefAt(int index)
+	{
+		if (index < 0 || index >= MaxStatuses)
+			return null;
+
+		return _statuses[index];
+	}
+
+	/// <summary>
 	/// Evaluates the current status processing state.
 	/// </summary>
 	/// <param name="delta">Delta time.</param>
