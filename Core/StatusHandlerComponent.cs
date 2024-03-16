@@ -39,7 +39,7 @@ public sealed partial class StatusHandlerComponent : Node
 	private StatusRegistry _registryRef;
 
 	[Export]
-	private int MaxStatuses = 8;
+	public int MaxStatuses = 8;
 
 	private IStatus[] _statuses;
 	private IEntity _owningEntityRef;
