@@ -119,10 +119,10 @@ public partial class HealthComponent : Node
 	/// </summary>
 	/// <param name="amount">The amount of health to restore.</param>
 	/// <param name="force">If set to true, the controller will bypass the must-be-above-zero health rule.</param>
-	public void RestoreHealth(float amount, bool force = false)
+	public float RestoreHealth(float amount, bool force = false)
 	{
 		if (!force && _health <= 0.0f)
-			return;
+			return 0.0f;
 
 		Debug.Assert(
 			condition: amount >= 0.0f,
@@ -131,6 +131,8 @@ public partial class HealthComponent : Node
 
 		_health = Mathf.Min(MaxHealth, _health + amount);
 		EmitSignal(SignalName.HealthChanged, GetHealth());
+
+		return amount;
 	}
 
 	/// <summary>
