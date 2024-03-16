@@ -19,14 +19,9 @@ public partial class HealthComponent : Node
 	public float MaxHealth = 100.0f;
 
 	[Export]
-	public float Armour;
-
-	[Export]
 	public bool IsInvulnerable;
 
 	private float _health;
-
-	public float BonusArmour;
 
 	public override void _Ready()
 	{
@@ -36,12 +31,26 @@ public partial class HealthComponent : Node
 	#region Main Functions
 
 	/// <summary>
-	/// Reduces the entity's health by a specified amount. Total damage may be affected by its armour value.
+	/// Called when the regular 'TakeDamage' is triggered,
+	/// override this to perform custom damage calculation before applying
+	/// the damage total.
+	/// </summary>
+	/// <param name="damage">The total base damage</param>
+	/// <param name="modifier">The damage multiplier.</param>
+	/// <returns></returns>
+	public virtual float CalculateDamage(float damage, float modifier = 1.0f) {
+		return damage * modifier;
+	}
+
+	/// <summary>
+	/// Applies a set amount of damage to the target entity.
+	/// Overridden HealthComponent controllers can add custom damage calculation to be applied
+	/// when using this function over 'TakePureDamage'.
 	/// </summary>
 	/// <param name="damage">The amount of damage to inflict the entity. (Must be positive.)</param>
-	/// <param name="multiplier">The base damage modifier.</param>
+	/// <param name="modifier">The base damage modifier.</param>
 	/// <returns></returns>
-	public float TakeDamage(float damage, float multiplier = 1.0f)
+	public float TakeDamage(float damage, float modifier = 1.0f)
 	{
 		if (IsInvulnerable || _health <= 0)
 			return 0.0f;
@@ -51,7 +60,7 @@ public partial class HealthComponent : Node
 			message: "TakeDamage: attempted to use a negative value in an unsigned operation."
 		);
 
-		float totalDamage = CalculateDamage(damage, multiplier);
+		float totalDamage = CalculateDamage(damage, modifier);
 		_health = Mathf.Max(0.0f, _health - totalDamage);
 
 		FireOnDamagedEvents();
@@ -59,9 +68,11 @@ public partial class HealthComponent : Node
 	}
 
 	/// <summary>
-	/// Reduces the entity's health by a specified amount, ignoring its armour value.
+	/// Reduces the entity's health by a fixed amount.
+	/// If called on an overridden health component, its custom damage calculation
+	/// will never be applied when using this method.
 	/// </summary>
-	/// <param name="damage">The amount of damage to inflict the entity.</param>
+	/// <param name="damage">The amount of damage to inflict on the entity.</param>
 	public void TakePureDamage(float damage)
 	{
 		if (IsInvulnerable)
@@ -76,6 +87,32 @@ public partial class HealthComponent : Node
 
 		FireOnDamagedEvents();
 	}
+
+	/// <summary>
+	/// Changes the entity's max health cap.
+	/// </summary>
+	/// <param name="maxHealth"></param>
+	public void SetMaxHealth(float maxHealth)
+	{
+		float currentHealthFac = GetHealthAsFac();
+		MaxHealth = maxHealth;
+
+		_health = maxHealth * currentHealthFac;
+	}
+
+	private void FireOnDamagedEvents()
+	{
+		if (_health > 0.0f) {
+			EmitSignal(SignalName.HealthChanged, _health);
+			return;
+		}
+
+		EmitSignal(SignalName.Death);
+	}
+
+	#endregion
+
+	#region Health State Getters
 
 	/// <summary>
 	/// Restores the entity's health by a specified amount.
@@ -97,58 +134,27 @@ public partial class HealthComponent : Node
 	}
 
 	/// <summary>
-	/// Calculates the total damage taken by the entity. (Overrideable.)
+	/// Returns whether or not the entity is alive.
 	/// </summary>
-	/// <param name="damage">The base damage value.</param>
-	/// <param name="multiplier">The damage modifier.</param>
 	/// <returns></returns>
-	public virtual float CalculateDamage(float damage, float multiplier = 1.0f)
-	{
-		return damage * multiplier * (damage / (damage + Armour + BonusArmour));
+	public bool IsAlive() {
+		return _health > 0.001f;
 	}
 
 	/// <summary>
 	/// Returns the entity's remaining health.
 	/// </summary>
-	/// <param name="asFac">If set to true, it will return the remaining health as a fraction.</param>
 	/// <returns></returns>
-	public float GetHealth(bool asFac = true)
-	{
-		if (asFac)
-			return _health / MaxHealth;
-
+	public float GetHealth() {
 		return _health;
 	}
 
 	/// <summary>
-	/// Changes the entity's max health cap.
-	/// </summary>
-	/// <param name="maxHealth"></param>
-	public void SetMaxHealth(float maxHealth)
-	{
-		float currentHealthFac = GetHealth();
-		MaxHealth = maxHealth;
-
-		_health = maxHealth * currentHealthFac;
-	}
-
-	/// <summary>
-	/// Returns whether or not the entity is alive.
+	/// Returns the entity's remaining health as a fraction (0.0 - 1.0).
 	/// </summary>
 	/// <returns></returns>
-	public bool IsAlive()
-	{
-		return _health > 0.001f;
-	}
-
-	private void FireOnDamagedEvents()
-	{
-		if (_health > 0.0f) {
-			EmitSignal(SignalName.HealthChanged, GetHealth());
-			return;
-		}
-
-		EmitSignal(SignalName.Death);
+	public float GetHealthAsFac() {
+		return _health / MaxHealth;
 	}
 
 	#endregion
