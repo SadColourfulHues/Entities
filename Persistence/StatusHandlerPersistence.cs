@@ -11,7 +11,6 @@ namespace SadChromaLib.Specialisations.Entities;
 
 public sealed partial class StatusHandlerComponent : ISerialisableComponent
 {
-	private static StringName KeyMaxCount => "maxCount";
 	private static StringName KeyStatuses => "status";
 	private static StringName KeyStatusId => "statusId";
 	private static StringName KeyStatusDuration => "statusDuration";
@@ -34,7 +33,6 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 		}
 
 		return new() {
-			[KeyMaxCount] = MaxStatuses,
 			[KeyStatuses] = serialisedStatuses
 		};
 	}
