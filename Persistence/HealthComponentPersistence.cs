@@ -18,7 +18,6 @@ public partial class HealthComponent : ISerialisableComponent
 		return new() {
 			[KeyHealth] = _health,
 			[KeyMaxhealth] = MaxHealth,
-			[KeyArmour] = Armour,
 			[KeyInvulnerable] = IsInvulnerable
 		};
 	}
@@ -27,7 +26,6 @@ public partial class HealthComponent : ISerialisableComponent
 	{
 		IsInvulnerable = (bool) data[KeyInvulnerable];
 		MaxHealth = (float) data[KeyMaxhealth];
-		Armour = (float) data[KeyArmour];
 		_health = (float) data[KeyHealth];
 
 		EmitSignal(SignalName.HealthChanged, GetHealth());

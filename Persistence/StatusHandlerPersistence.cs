@@ -11,6 +11,7 @@ namespace SadChromaLib.Specialisations.Entities;
 
 public sealed partial class StatusHandlerComponent : ISerialisableComponent
 {
+	private static StringName KeyMaxCount => "maxCount";
 	private static StringName KeyStatuses => "status";
 	private static StringName KeyStatusId => "statusId";
 	private static StringName KeyStatusDuration => "statusDuration";
@@ -33,12 +34,23 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 		}
 
 		return new() {
+			[KeyMaxCount] = MaxStatuses,
 			[KeyStatuses] = serialisedStatuses
 		};
 	}
 
 	public void Deserialise(SerialisedData data)
 	{
+		// Malformed data
+		if (!data.ContainsKey(KeyStatuses)) {
+			for (int i = 0; i < MaxStatuses; ++i) {
+				_statuses[i] = null;
+			}
+
+			_isLocked = false;
+			return;
+		}
+
 		Array<SerialisedData> statuses = (Array<SerialisedData>) data[KeyStatuses];
 		_isLocked = false;
 
