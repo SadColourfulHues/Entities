@@ -39,12 +39,20 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 
 	public void Deserialise(SerialisedData data)
 	{
-		// Malformed data
-		if (!data.ContainsKey(KeyStatuses)) {
-			for (int i = 0; i < MaxStatuses; ++i) {
-				_statuses[i] = null;
+		// Clear previous entries
+		for (int i = 0; i < MaxStatuses; ++i) {
+			if (_statuses[i] is not null) {
+				EmitSignal(
+					SignalName.StatusRemoved,
+					_statuses[i].StatusGetIdentifier()
+				);
 			}
 
+			_statuses[i] = null;
+		}
+
+		// Malformed data
+		if (!data.ContainsKey(KeyStatuses)) {
 			_isLocked = false;
 			return;
 		}
@@ -53,16 +61,9 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 		_isLocked = false;
 
 		for (int i = 0; i < statuses.Count; ++ i) {
-			if (statuses[i] == null ||
+			if (statuses[i] is null ||
 				statuses[i].Count < 1)
 			{
-				if (_statuses[i] != null) {
-					EmitSignal(
-						SignalName.StatusRemoved,
-						_statuses[i].StatusGetIdentifier()
-					);
-				}
-
 				_statuses[i] = null;
 				continue;
 			}
