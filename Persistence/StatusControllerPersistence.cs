@@ -9,7 +9,7 @@ using SerialisedData = Godot.Collections.Dictionary<Godot.StringName, Godot.Vari
 
 namespace SadChromaLib.Specialisations.Entities;
 
-public sealed partial class StatusHandlerComponent : ISerialisableComponent
+public sealed partial class StatusHandlerController : ISerialisableComponent
 {
 	private static StringName KeyStatuses => "status";
 	private static StringName KeyStatusId => "statusId";
@@ -42,10 +42,7 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 		// Clear previous entries
 		for (int i = 0; i < MaxStatuses; ++i) {
 			if (_statuses[i] is not null) {
-				EmitSignal(
-					SignalName.StatusRemoved,
-					_statuses[i].StatusGetIdentifier()
-				);
+				OnStatusRemoved?.Invoke(_statuses[i].StatusGetIdentifier());
 			}
 
 			_statuses[i] = null;
@@ -71,8 +68,8 @@ public sealed partial class StatusHandlerComponent : ISerialisableComponent
 			StringName statusId = (string) statuses[i][KeyStatusId];
 			float duration = (float) statuses[i][KeyStatusDuration];
 
-			_statuses[i] = _registryRef.CreateStatus(statusId, duration);
-			EmitSignal(SignalName.StatusAdded, statusId);
+			_statuses[i] = _registry.CreateStatus(statusId, duration);
+			OnStatusAdded?.Invoke(statusId);
 		}
 	}
 }

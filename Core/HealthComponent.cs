@@ -21,14 +21,25 @@ public partial class HealthComponent : Node
 	[Export]
 	public bool IsInvulnerable;
 
-	private float _health;
+	private HealthController _controller;
 
-	public override void _Ready()
+	public override void _EnterTree()
 	{
-		_health = MaxHealth;
+		_controller = new(MaxHealth, IsInvulnerable);
+
+		_controller.OnHealthChanged = OnHealthChangedDelegate;
+		_controller.OnDeath = OnDeathDelegate;
 	}
 
-	#region Main Functions
+	/// <summary>
+	/// Returns the reference of this component's internal controller.
+	/// </summary>
+	/// <returns></returns>
+	public HealthController GetController() {
+		return _controller;
+	}
+
+	#region Convenience Forward Methods
 
 	/// <summary>
 	/// Called when the regular 'TakeDamage' is triggered,
@@ -50,21 +61,9 @@ public partial class HealthComponent : Node
 	/// <param name="damage">The amount of damage to inflict the entity. (Must be positive.)</param>
 	/// <param name="modifier">The base damage modifier.</param>
 	/// <returns></returns>
-	public float TakeDamage(float damage, float modifier = 1.0f)
-	{
-		if (IsInvulnerable || _health <= 0)
-			return 0.0f;
-
-		Debug.Assert(
-			condition: damage >= 0.0f,
-			message: "TakeDamage: attempted to use a negative value in an unsigned operation."
-		);
-
-		float totalDamage = CalculateDamage(damage, modifier);
-		_health = Mathf.Max(0.0f, _health - totalDamage);
-
-		FireOnDamagedEvents();
-		return totalDamage;
+	public float TakeDamage(float damage, float modifier = 1.0f) {
+		_controller.OnCalculateDamage = (float dmg) => CalculateDamage(dmg, modifier);
+		return _controller.TakeDamage(damage);
 	}
 
 	/// <summary>
@@ -73,66 +72,16 @@ public partial class HealthComponent : Node
 	/// will never be applied when using this method.
 	/// </summary>
 	/// <param name="damage">The amount of damage to inflict on the entity.</param>
-	public void TakeFixedDamage(float damage)
-	{
-		if (IsInvulnerable)
-			return;
-
-		Debug.Assert(
-			condition: damage >= 0.0f,
-			message: "TakeDamage: attempted to use a negative value in an unsigned operation."
-		);
-
-		_health = Mathf.Max(0.0f, _health - damage);
-
-		FireOnDamagedEvents();
+	public float TakeFixedDamage(float damage) {
+		return _controller.TakeFixedDamage(damage);
 	}
-
-	/// <summary>
-	/// Changes the entity's max health cap.
-	/// </summary>
-	/// <param name="maxHealth"></param>
-	public void SetMaxHealth(float maxHealth)
-	{
-		float currentHealthFac = GetHealthAsFac();
-		MaxHealth = maxHealth;
-
-		_health = maxHealth * currentHealthFac;
-	}
-
-	private void FireOnDamagedEvents()
-	{
-		if (_health > 0.0f) {
-			EmitSignal(SignalName.HealthChanged, _health);
-			return;
-		}
-
-		EmitSignal(SignalName.Death);
-	}
-
-	#endregion
-
-	#region Health State Getters
 
 	/// <summary>
 	/// Restores the entity's health by a specified amount.
 	/// </summary>
 	/// <param name="amount">The amount of health to restore.</param>
-	/// <param name="force">If set to true, the controller will bypass the must-be-above-zero health rule.</param>
-	public float RestoreHealth(float amount, bool force = false)
-	{
-		if (!force && _health <= 0.0f)
-			return 0.0f;
-
-		Debug.Assert(
-			condition: amount >= 0.0f,
-			message: "RestoreHealth: attempted to use a negative value in an unsigned operation."
-		);
-
-		_health = Mathf.Min(MaxHealth, _health + amount);
-		EmitSignal(SignalName.HealthChanged, GetHealth());
-
-		return amount;
+	public float RestoreHealth(float amount) {
+		return _controller.RestoreHealth(amount);
 	}
 
 	/// <summary>
@@ -140,7 +89,7 @@ public partial class HealthComponent : Node
 	/// </summary>
 	/// <returns></returns>
 	public bool IsAlive() {
-		return _health > 0.001f;
+		return _controller.IsAlive();
 	}
 
 	/// <summary>
@@ -148,7 +97,7 @@ public partial class HealthComponent : Node
 	/// </summary>
 	/// <returns></returns>
 	public float GetHealth() {
-		return _health;
+		return _controller.GetHealth();
 	}
 
 	/// <summary>
@@ -156,7 +105,19 @@ public partial class HealthComponent : Node
 	/// </summary>
 	/// <returns></returns>
 	public float GetHealthAsFac() {
-		return _health / MaxHealth;
+		return _controller.GetHealthAsFac();
+	}
+
+	#endregion
+
+	#region Event to Signal
+
+	private void OnHealthChangedDelegate(float newHealth) {
+		EmitSignal(SignalName.HealthChanged, newHealth);
+	}
+
+	private void OnDeathDelegate() {
+		EmitSignal(SignalName.Death);
 	}
 
 	#endregion

@@ -1,12 +1,10 @@
-using Godot;
-
 using SadChromaLib.Persistence;
 
 using SerialisedData = Godot.Collections.Dictionary<Godot.StringName, Godot.Variant>;
 
 namespace SadChromaLib.Specialisations.Entities;
 
-public partial class HealthComponent : ISerialisableComponent
+public sealed partial class StatusHandlerComponent : ISerialisableComponent
 {
 	public SerialisedData Serialise() {
 		return _controller.Serialise();
