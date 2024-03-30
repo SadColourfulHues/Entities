@@ -9,7 +9,7 @@ namespace SadChromaLib.Specialisations.Entities;
 public sealed partial class StatusDefinition : Resource
 {
 	[Export]
-	public StringName StatusId;
+	public string StatusId;
 
 	[Export]
 	public string DisplayName;

@@ -9,13 +9,13 @@ namespace SadChromaLib.Specialisations.Entities;
 public sealed partial class StatusHandlerComponent : Node
 {
 	[Signal]
-	public delegate void StatusAddedEventHandler(StringName statusId);
+	public delegate void StatusAddedEventHandler(string statusId);
 
 	[Signal]
-	public delegate void StatusTickEventHandler(StringName statusId, float duration);
+	public delegate void StatusTickEventHandler(string statusId, float duration);
 
 	[Signal]
-	public delegate void StatusRemovedEventHandler(StringName statusId);
+	public delegate void StatusRemovedEventHandler(string statusId);
 
     [Export]
 	private StatusRegistry _registryRef;
@@ -81,7 +81,7 @@ public sealed partial class StatusHandlerComponent : Node
 	/// </summary>
 	/// <param name="statusId">The ID of the status effect.</param>
 	/// <returns></returns>
-	public bool HasStatus(StringName statusId) {
+	public bool HasStatus(string statusId) {
 		return _controller.HasStatus(statusId);
 	}
 
@@ -90,7 +90,7 @@ public sealed partial class StatusHandlerComponent : Node
 	/// </summary>
 	/// <param name="id">The ID of the status effect</param>
 	/// <param name="duration">How long the status effect should last.</param>
-	public void AddStatus(StringName id, float duration) {
+	public void AddStatus(string id, float duration) {
 		_controller.AddStatus(id, duration);
 	}
 
@@ -98,7 +98,7 @@ public sealed partial class StatusHandlerComponent : Node
 	/// Removes a status effect from the entity.
 	/// </summary>
 	/// <param name="statusId">The ID of the status effect.</param>
-	public void RemoveStatus(StringName statusId) {
+	public void RemoveStatus(string statusId) {
 		_controller.RemoveStatus(statusId);
 	}
 
@@ -113,15 +113,15 @@ public sealed partial class StatusHandlerComponent : Node
 
 	#region Event to Signal
 
-	private void OnStatusAddedDelegate(StringName statusId) {
+	private void OnStatusAddedDelegate(string statusId) {
 		EmitSignal(SignalName.StatusAdded, statusId);
 	}
 
-	private void OnStatusTickDelegate(StringName statusId, float duration) {
+	private void OnStatusTickDelegate(string statusId, float duration) {
 		EmitSignal(SignalName.StatusTick, statusId, duration);
 	}
 
-	private void OnStatusRemovedDelegate(StringName statusId) {
+	private void OnStatusRemovedDelegate(string statusId) {
 		EmitSignal(SignalName.StatusRemoved, statusId);
 	}
 

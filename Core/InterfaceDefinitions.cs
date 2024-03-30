@@ -24,6 +24,6 @@ public interface IStatus
 	void StatusRemoved(IEntity entity);
 	void StatusTick(IEntity entity, float delta);
 
-	StringName StatusGetIdentifier();
+	string StatusGetIdentifier();
 	float StatusGetRemainingDuration();
 }

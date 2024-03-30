@@ -18,7 +18,7 @@ public abstract partial class BaseStatus : RefCounted, IStatus
 		_lifetime = duration;
 	}
 
-    public abstract StringName StatusGetIdentifier();
+    public abstract string StatusGetIdentifier();
 
 	protected virtual void OnStatusAdded(IEntity entityRef) {}
 	protected virtual void OnStatusRemoved(IEntity entityRef) {}

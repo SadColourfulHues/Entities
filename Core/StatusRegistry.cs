@@ -15,7 +15,7 @@ public sealed partial class StatusRegistry : Resource
 	[Export]
 	private StatusDefinition[] _definitions;
 
-	private readonly Dictionary<StringName, Type> _statusTypes;
+	private readonly Dictionary<string, Type> _statusTypes;
 	private bool _isInitialised;
 
 	public StatusRegistry()
@@ -44,7 +44,7 @@ public sealed partial class StatusRegistry : Resource
 	/// </summary>
 	/// <param name="statusId">The status ID to check.</param>
 	/// <returns></returns>
-	public bool IsValid(StringName statusId)
+	public bool IsValid(string statusId)
 	{
 		ReadOnlySpan<StatusDefinition> definitions = _definitions;
 
@@ -63,7 +63,7 @@ public sealed partial class StatusRegistry : Resource
 	/// </summary>
 	/// <param name="statusId"></param>
 	/// <returns></returns>
-	public StatusDefinition GetDefinition(StringName statusId)
+	public StatusDefinition GetDefinition(string statusId)
 	{
 		ReadOnlySpan<StatusDefinition> definitions = _definitions;
 
@@ -83,7 +83,7 @@ public sealed partial class StatusRegistry : Resource
 	/// <param name="statusId">The ID of the status effect.</param>
 	/// <param name="duration">How long should the status effect last.</param>
 	/// <returns></returns>
-	public IStatus CreateStatus(StringName statusId, float duration)
+	public IStatus CreateStatus(string statusId, float duration)
 	{
 		Debug.Assert(
 			condition: _statusTypes.ContainsKey(statusId),
@@ -112,7 +112,7 @@ public sealed partial class StatusRegistry : Resource
 [AttributeUsage(AttributeTargets.Class)]
 public class BindStatusId : Attribute
 {
-	public StringName StatusId;
+	public string StatusId;
 
 	public BindStatusId(string id)
 	{

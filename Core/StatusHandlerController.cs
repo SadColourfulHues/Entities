@@ -1,5 +1,3 @@
-using Godot;
-
 using System;
 using System.Diagnostics;
 
@@ -10,11 +8,11 @@ namespace SadChromaLib.Specialisations.Entities;
 /// </summary>
 public sealed partial class StatusHandlerController
 {
-	public delegate void StatusAddedDelegate(StringName statusId);
+	public delegate void StatusAddedDelegate(string statusId);
 
-	public delegate void StatusTickDelegate(StringName statusId, float duration);
+	public delegate void StatusTickDelegate(string statusId, float duration);
 
-	public delegate void StatusRemovedDelegate(StringName statusId);
+	public delegate void StatusRemovedDelegate(string statusId);
 
 	public StatusAddedDelegate OnStatusAdded = null;
 	public StatusTickDelegate OnStatusTick = null;
@@ -67,7 +65,7 @@ public sealed partial class StatusHandlerController
 			if (_statuses[i] == null)
 				continue;
 
-			StringName statusId = _statuses[i].StatusGetIdentifier();
+			string statusId = _statuses[i].StatusGetIdentifier();
 
 			if (!_statuses[i].StatusIsActive(_entity)) {
 				_statuses[i].StatusRemoved(_entity);
@@ -91,7 +89,7 @@ public sealed partial class StatusHandlerController
 	/// </summary>
 	/// <param name="statusId">The ID of the status effect.</param>
 	/// <returns></returns>
-	public bool HasStatus(StringName statusId)
+	public bool HasStatus(string statusId)
 	{
 		ReadOnlySpan<IStatus> statuses = _statuses;
 
@@ -125,7 +123,7 @@ public sealed partial class StatusHandlerController
 		if (_isLocked)
 			return;
 
-		StringName statusId = status.StatusGetIdentifier();
+		string statusId = status.StatusGetIdentifier();
 		int? slot = null;
 
 		// Overwrite status if the new duration is greater
@@ -161,7 +159,7 @@ public sealed partial class StatusHandlerController
 	/// </summary>
 	/// <param name="id">The ID of the status effect</param>
 	/// <param name="duration">How long the status effect should last.</param>
-	public void AddStatus(StringName id, float duration) {
+	public void AddStatus(string id, float duration) {
 		AddStatus(_registry.CreateStatus(id, duration));
 	}
 
@@ -169,7 +167,7 @@ public sealed partial class StatusHandlerController
 	/// Removes a status effect from the entity.
 	/// </summary>
 	/// <param name="statusId">The ID of the status effect.</param>
-	public void RemoveStatus(StringName statusId)
+	public void RemoveStatus(string statusId)
 	{
 		ReadOnlySpan<IStatus> statuses = _statuses;
 
@@ -177,7 +175,7 @@ public sealed partial class StatusHandlerController
 			if (statuses[i] == null)
 				continue;
 
-			StringName id = statuses[i].StatusGetIdentifier();
+			string id = statuses[i].StatusGetIdentifier();
 
 			if (id != statusId)
 				continue;

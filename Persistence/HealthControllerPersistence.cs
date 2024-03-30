@@ -1,32 +1,21 @@
-using Godot;
-
 using SadChromaLib.Persistence;
-
-using SerialisedData = Godot.Collections.Dictionary<Godot.StringName, Godot.Variant>;
 
 namespace SadChromaLib.Specialisations.Entities;
 
 public partial class HealthController : ISerialisableComponent
 {
-	private static StringName KeyHealth => "health";
-	private static StringName KeyMaxhealth => "maxHealth";
-	private static StringName KeyArmour => "armour";
-	private static StringName KeyInvulnerable => "isInvulnerable";
-
-	public SerialisedData Serialise()
+	public void Serialise(PersistenceWriter writer)
 	{
-		return new() {
-			[KeyHealth] = _health,
-			[KeyMaxhealth] = _maxHealth,
-			[KeyInvulnerable] = IsInvulnerable
-		};
+		writer.Write(_health);
+		writer.Write(_maxHealth);
+		writer.Write(IsInvulnerable);
 	}
 
-	public void Deserialise(SerialisedData data)
+	public void Deserialise(PersistenceReader reader)
 	{
-		IsInvulnerable = (bool) data[KeyInvulnerable];
-		_maxHealth = (float) data[KeyMaxhealth];
-		_health = (float) data[KeyHealth];
+		_health = reader.ReadFloat();
+		_maxHealth = reader.ReadFloat();
+		IsInvulnerable = reader.ReadBool();
 
 		OnHealthChanged?.Invoke(GetHealth());
 	}
