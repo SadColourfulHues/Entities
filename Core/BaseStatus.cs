@@ -5,7 +5,7 @@ namespace SadChromaLib.Specialisations.Entities;
 /// <summary>
 /// A basic implementation of IStatus that enables the fast creation of status effect handlers.
 /// </summary>
-public abstract partial class BaseStatus : RefCounted, IStatus
+public abstract partial class BaseStatus: IStatus
 {
 	protected float _lifetime;
 
